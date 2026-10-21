@@ -4,68 +4,115 @@ using TMPro;
 
 public class MaintenanceManager : MonoBehaviour
 {
-    [Header("Wall Alert Canvas")]
-    [SerializeField] private GameObject wallAlertPanel;
-    [SerializeField] private TMP_Text wallAlertText;
+    [Header("Spatial Panel UI References")]
+    [SerializeField] private TMP_Text panelTitleText;   // Screen Header
+    [SerializeField] private TMP_Text panelBodyText;    // Screen Body
+    [SerializeField] private GameObject showListButton; // "Show List" UI Button
+    [SerializeField] private TMP_Text timerText;        // Countdown Timer Text
 
-    [Header("Camera HUD List (Appears on Grab)")]
-    [SerializeField] private GameObject hudListPanel;
-    [SerializeField] private TMP_Text hudListText;
-
-    [Header("Audio")]
+    [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip alertSound;
 
-    [Header("Timing Settings")]
-    [SerializeField] private float startDelay = 2.0f;
-    [SerializeField] private float displayDuration = 3.0f;
+    [Header("Timer & Alert Settings")]
+    [SerializeField] private float timeRemaining = 180f; // 3 minutes countdown
+    [SerializeField] private float startDelay = 2.0f;     // Alert pops up after 2 seconds
+
+    private bool isTimerRunning = true;
 
     void Start()
     {
-        if (wallAlertPanel != null) wallAlertPanel.SetActive(false);
-        if (hudListPanel != null) hudListPanel.SetActive(false); // Hide HUD list on start
+        // Hide button on startup and set screen to normal status
+        if (showListButton != null) showListButton.SetActive(false);
+        SetPanelIdle();
 
-        StartCoroutine(AlertSequenceRoutine());
+        // Start countdown and alert sequence
+        isTimerRunning = true;
+        StartCoroutine(TriggerAlertSequence());
     }
 
-    private IEnumerator AlertSequenceRoutine()
+    void Update()
     {
+        // Run 3-minute countdown timer
+        if (!isTimerRunning) return;
+
+        if (timeRemaining > 0)
+        {
+            timeRemaining -= Time.deltaTime;
+            DisplayTime(timeRemaining);
+        }
+        else
+        {
+            timeRemaining = 0;
+            isTimerRunning = false;
+            DisplayTime(0);
+        }
+    }
+
+    private void DisplayTime(float timeToDisplay)
+    {
+        if (timerText == null) return;
+        float minutes = Mathf.FloorToInt(timeToDisplay / 60);
+        float seconds = Mathf.FloorToInt(timeToDisplay % 60);
+        timerText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
+    }
+
+    private void SetPanelIdle()
+    {
+        if (panelTitleText != null) panelTitleText.text = "SYSTEM STATUS: NORMAL";
+        if (panelBodyText != null) panelBodyText.text = "All turbine systems operating within normal parameters.";
+    }
+
+    private IEnumerator TriggerAlertSequence()
+    {
+        // Wait 2 seconds
         yield return new WaitForSeconds(startDelay);
 
-        if (wallAlertPanel != null) wallAlertPanel.SetActive(true);
-        if (wallAlertText != null)
+        // 1. Update text to Red Alert
+        if (panelTitleText != null)
         {
-            wallAlertText.text = "ALERT: MAINTENANCE IDENTIFIED \n\nProceed to the work table and retrieve your task specification sheet.";
+            panelTitleText.text = "<color=red>⚠️ MAINTENANCE IDENTIFIED ⚠️</color>";
         }
 
+        if (panelBodyText != null)
+        {
+            panelBodyText.text = "Inspection required for Turbine #3 Gearbox.\nClick the button below to view the loading manifest.";
+        }
+
+        // 2. Play alert sound
         if (audioSource != null && alertSound != null)
         {
             audioSource.PlayOneShot(alertSound);
         }
 
-        yield return new WaitForSeconds(displayDuration);
-
-        if (wallAlertPanel != null) wallAlertPanel.SetActive(false);
+        // 3. Show "Show List" button
+        if (showListButton != null)
+        {
+            showListButton.SetActive(true);
+        }
     }
 
-    // Call this event from the XR Grab Interactable on the 3D Clipboard
-    public void OnTaskListGrabbed()
+    // Triggered when user clicks/touches the "Show List" button
+    public void OnShowListButtonClicked()
     {
-        // Show the list attached directly in front of the VR camera
-        if (hudListPanel != null)
+        // Show loading manifest directly on screen
+        if (panelTitleText != null)
         {
-            hudListPanel.SetActive(true);
+            panelTitleText.text = "<color=yellow>VESSEL LOADING MANIFEST</color>";
         }
 
-        if (hudListText != null)
+        if (panelBodyText != null)
         {
-            hudListText.text = "TASK DESCRIPTION:\n" +
-                                 "• Inspect Gearbox in Turbine #3\n\n" +
-                                 "VESSEL LOADING MANIFEST:\n" +
-                                 "Gearbox Replacement Unit\n" +
-                                 "Synthetic Lubricant (10L)\n" +
-                                 "Calibration Wrench\n" +
-                                 "Safety Harness";
+            panelBodyText.text = "• Gearbox Inspection Endoscope\n" +
+                                 "• Synthetic Lubricant (10L Container)\n" +
+                                 "• Calibrated Torque Wrench & Sockets\n" +
+                                 "• Safety Harness & LOTO Kit";
+        }
+
+        // Hide button after clicking
+        if (showListButton != null)
+        {
+            showListButton.SetActive(false);
         }
     }
 }
