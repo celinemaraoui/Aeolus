@@ -5,35 +5,36 @@ using TMPro;
 public class MaintenanceManager : MonoBehaviour
 {
     [Header("Spatial Panel UI References")]
-    [SerializeField] private TMP_Text panelTitleText;   // Screen Header
-    [SerializeField] private TMP_Text panelBodyText;    // Screen Body
-    [SerializeField] private GameObject showListButton; // "Show List" UI Button
-    [SerializeField] private TMP_Text timerText;        // Countdown Timer Text
+    [SerializeField] private TMP_Text panelTitleText;
+    [SerializeField] private TMP_Text panelBodyText;
+    [SerializeField] private GameObject showListButton;
+    [SerializeField] private TMP_Text timerText;
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip alertSound;
 
+    [Header("Teleport Settings")]
+    [SerializeField] private Transform xrOriginTransform;      // Drag your XR Origin (XR Rig) here
+    [SerializeField] private Transform warehouseSpawnPoint;  // Drag your WarehouseSpawnPoint here
+    [SerializeField] private float teleportDelay = 2.0f;     // Seconds to wait after clicking before teleporting
+
     [Header("Timer & Alert Settings")]
-    [SerializeField] private float timeRemaining = 180f; // 3 minutes countdown
-    [SerializeField] private float startDelay = 2.0f;     // Alert pops up after 2 seconds
+    [SerializeField] private float timeRemaining = 180f;
+    [SerializeField] private float startDelay = 2.0f;
 
     private bool isTimerRunning = true;
 
     void Start()
     {
-        // Hide button on startup and set screen to normal status
         if (showListButton != null) showListButton.SetActive(false);
         SetPanelIdle();
-
-        // Start countdown and alert sequence
         isTimerRunning = true;
         StartCoroutine(TriggerAlertSequence());
     }
 
     void Update()
     {
-        // Run 3-minute countdown timer
         if (!isTimerRunning) return;
 
         if (timeRemaining > 0)
@@ -65,54 +66,86 @@ public class MaintenanceManager : MonoBehaviour
 
     private IEnumerator TriggerAlertSequence()
     {
-        // Wait 2 seconds
         yield return new WaitForSeconds(startDelay);
 
-        // 1. Update text to Red Alert
         if (panelTitleText != null)
         {
-            panelTitleText.text = "<color=red>⚠️ MAINTENANCE IDENTIFIED ⚠️</color>";
+            panelTitleText.text = "<color=red>MAINTENANCE IDENTIFIED</color>";
         }
 
         if (panelBodyText != null)
         {
-            panelBodyText.text = "Inspection required for Turbine #3 Gearbox.\nClick the button below to view the loading manifest.";
+            panelBodyText.text = "Inspection required for Turbine #3 Gearbox.\nClick the button below to view manifest & deploy to Warehouse.";
         }
 
-        // 2. Play alert sound
         if (audioSource != null && alertSound != null)
         {
             audioSource.PlayOneShot(alertSound);
         }
 
-        // 3. Show "Show List" button
         if (showListButton != null)
         {
             showListButton.SetActive(true);
         }
     }
 
-    // Triggered when user clicks/touches the "Show List" button
+    // Triggered when user clicks the "Show Task List" button on the wall
     public void OnShowListButtonClicked()
     {
-        // Show loading manifest directly on screen
+        // 1. Show the manifest on the wall screen
         if (panelTitleText != null)
         {
-            panelTitleText.text = "<color=yellow>VESSEL LOADING MANIFEST</color>";
+            panelTitleText.text = "<color=yellow>MANIFEST & REDEPLOYING...</color>";
         }
 
         if (panelBodyText != null)
         {
             panelBodyText.text = "• Gearbox Inspection Endoscope\n" +
-                                 "• Synthetic Lubricant (10L Container)\n" +
-                                 "• Calibrated Torque Wrench & Sockets\n" +
-                                 "• Safety Harness & LOTO Kit";
+                                 "• Synthetic Lubricant (10L)\n" +
+                                 "• Calibrated Torque Wrench\n\n" +
+                                 "<i>Teleporting to Warehouse...</i>";
         }
 
-        // Hide button after clicking
+        // 2. Hide button
         if (showListButton != null)
         {
             showListButton.SetActive(false);
+        }
+
+        // 3. Start teleport sequence
+        StartCoroutine(TeleportRoutine());
+    }
+
+    private IEnumerator TeleportRoutine()
+    {
+        // Wait a couple seconds so the user can read the manifest before moving
+        yield return new WaitForSeconds(teleportDelay);
+
+        if (xrOriginTransform != null && warehouseSpawnPoint != null)
+        {
+            CharacterController characterController = xrOriginTransform.GetComponent<CharacterController>();
+
+            // Temporarily disable Character Controller to prevent physics snapping issues
+            if (characterController != null)
+            {
+                characterController.enabled = false;
+            }
+
+            // Move player to warehouse spawn point
+            xrOriginTransform.position = warehouseSpawnPoint.position;
+            xrOriginTransform.rotation = warehouseSpawnPoint.rotation;
+
+            // Re-enable Character Controller
+            if (characterController != null)
+            {
+                characterController.enabled = true;
+            }
+
+            Debug.Log("Teleported player to the warehouse!");
+        }
+        else
+        {
+            Debug.LogWarning("XR Origin or Warehouse Spawn Point is not assigned in the Inspector!");
         }
     }
 }
