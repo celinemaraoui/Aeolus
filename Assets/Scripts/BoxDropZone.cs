@@ -2,20 +2,22 @@ using UnityEngine;
 
 public class BoxDropZone : MonoBehaviour
 {
-    [Header("Settings")]
-    [SerializeField] private string itemTag = "ToolItem"; // The tag assigned to your items
+    [Header("References")]
+    [SerializeField] private BoxManager boxManager; // Drag your Box object here
+    [SerializeField] private string itemTag = "ToolItem";
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the object entering the box is a tool item
         if (other.CompareTag(itemTag))
         {
-            // Optional: Play a success sound or visual particle effect here
-
-            // Make the item disappear
+            // Destroy the tool item
             Destroy(other.gameObject);
 
-            Debug.Log("Item successfully placed in the box!");
+            // Tell the box manager a tool was collected
+            if (boxManager != null)
+            {
+                boxManager.ToolCollected();
+            }
         }
     }
 }

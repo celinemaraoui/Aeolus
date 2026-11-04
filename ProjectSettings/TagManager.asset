@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Anchor
   - ToolItem
+  - WarehouseDropOff
   layers:
   - Default
   - TransparentFX
