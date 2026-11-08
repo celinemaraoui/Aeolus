@@ -6,7 +6,11 @@ public class BoxManager : MonoBehaviour
 {
     [Header("Quest Settings")]
     [Tooltip("Total number of tools required before the box can be picked up.")]
+<<<<<<< Updated upstream
     public int totalToolsRequired = 4; // Public variable requested
+=======
+    public int totalToolsRequired = 5; // Public variable requested
+>>>>>>> Stashed changes
     private int currentToolsCollected = 0;
 
     [Header("References")]
