@@ -1,151 +1,106 @@
 ﻿using System.Collections;
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI; // Required for Image UI component
 
 public class MaintenanceManager : MonoBehaviour
 {
     [Header("Spatial Panel UI References")]
-    [SerializeField] private TMP_Text panelTitleText;
-    [SerializeField] private TMP_Text panelBodyText;
-    [SerializeField] private GameObject showListButton;
-    [SerializeField] private TMP_Text timerText;
+    [SerializeField] private Image panelBackgroundImage;    // The UI Image showing the screen graphic
+    [SerializeField] private GameObject showListButtonObj;   // The interactive "Manifest" button object
+
+    [Header("UI Sprites (Designs)")]
+    [SerializeField] private Sprite normalStateSprite;       // Screen 1: System Status Normal
+    [SerializeField] private Sprite alertStateSprite;        // Screen 2: Maintenance Identified + Manifest Button
+    [SerializeField] private Sprite manifestStateSprite;     // Screen 3: Manifest List & Redeploying
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip alertSound;
 
     [Header("Teleport Settings")]
-    [SerializeField] private Transform xrOriginTransform;      // Drag your XR Origin (XR Rig) here
-    [SerializeField] private Transform warehouseSpawnPoint;  // Drag your WarehouseSpawnPoint here
-    [SerializeField] private float teleportDelay = 2.0f;     // Seconds to wait after clicking before teleporting
+    [SerializeField] private Transform xrOriginTransform;
+    [SerializeField] private Transform warehouseSpawnPoint;
+    [SerializeField] private float teleportDelay = 2.0f;
 
-    [Header("Timer & Alert Settings")]
-    [SerializeField] private float timeRemaining = 180f;
+    [Header("Timer Settings")]
     [SerializeField] private float startDelay = 2.0f;
-
-    private bool isTimerRunning = true;
 
     void Start()
     {
-        if (showListButton != null) showListButton.SetActive(false);
-        SetPanelIdle();
-        isTimerRunning = true;
+        // 1. Hide the button at start
+        if (showListButtonObj != null) showListButtonObj.SetActive(false);
+
+        // 2. Set initial normal state graphic
+        SetPanelNormal();
+
+        // 3. Start alert sequence timer
         StartCoroutine(TriggerAlertSequence());
     }
 
-    void Update()
+    private void SetPanelNormal()
     {
-        if (!isTimerRunning) return;
-
-        if (timeRemaining > 0)
+        if (panelBackgroundImage != null && normalStateSprite != null)
         {
-            timeRemaining -= Time.deltaTime;
-            DisplayTime(timeRemaining);
+            panelBackgroundImage.sprite = normalStateSprite;
         }
-        else
-        {
-            timeRemaining = 0;
-            isTimerRunning = false;
-            DisplayTime(0);
-        }
-    }
-
-    private void DisplayTime(float timeToDisplay)
-    {
-        if (timerText == null) return;
-        float minutes = Mathf.FloorToInt(timeToDisplay / 60);
-        float seconds = Mathf.FloorToInt(timeToDisplay % 60);
-        timerText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
-    }
-
-    private void SetPanelIdle()
-    {
-        if (panelTitleText != null) panelTitleText.text = "SYSTEM STATUS: NORMAL";
-        if (panelBodyText != null) panelBodyText.text = "All turbine systems operating within normal parameters.";
     }
 
     private IEnumerator TriggerAlertSequence()
     {
+        // Wait 2 seconds
         yield return new WaitForSeconds(startDelay);
 
-        if (panelTitleText != null)
+        // 1. Switch graphic to the Alert state (with the orange Manifest button visible on the design)
+        if (panelBackgroundImage != null && alertStateSprite != null)
         {
-            panelTitleText.text = "<color=red>MAINTENANCE IDENTIFIED</color>";
+            panelBackgroundImage.sprite = alertStateSprite;
         }
 
-        if (panelBodyText != null)
-        {
-            panelBodyText.text = "Inspection required for Turbine #3 Gearbox.\nClick the button below to view manifest & deploy to Warehouse.";
-        }
-
+        // 2. Play warning sound
         if (audioSource != null && alertSound != null)
         {
             audioSource.PlayOneShot(alertSound);
         }
 
-        if (showListButton != null)
+        // 3. Enable the interactive button object over the graphic's button area
+        if (showListButtonObj != null)
         {
-            showListButton.SetActive(true);
+            showListButtonObj.SetActive(true);
         }
     }
 
-    // Triggered when user clicks the "Show Task List" button on the wall
+    // Triggered when user clicks/interacts with the button on the panel
     public void OnShowListButtonClicked()
     {
-        // 1. Show the manifest on the wall screen
-        if (panelTitleText != null)
+        // 1. Switch graphic to the Manifest & Redeploying state
+        if (panelBackgroundImage != null && manifestStateSprite != null)
         {
-            panelTitleText.text = "<color=yellow>MANIFEST & REDEPLOYING...</color>";
+            panelBackgroundImage.sprite = manifestStateSprite;
         }
 
-        if (panelBodyText != null)
+        // 2. Hide the button
+        if (showListButtonObj != null)
         {
-            panelBodyText.text = "• Gearbox Inspection Endoscope\n" +
-                                 "• Synthetic Lubricant (10L)\n" +
-                                 "• Calibrated Torque Wrench\n\n" +
-                                 "<i>Teleporting to Warehouse...</i>";
+            showListButtonObj.SetActive(false);
         }
 
-        // 2. Hide button
-        if (showListButton != null)
-        {
-            showListButton.SetActive(false);
-        }
-
-        // 3. Start teleport sequence
+        // 3. Start teleport sequence to warehouse
         StartCoroutine(TeleportRoutine());
     }
 
     private IEnumerator TeleportRoutine()
     {
-        // Wait a couple seconds so the user can read the manifest before moving
         yield return new WaitForSeconds(teleportDelay);
 
         if (xrOriginTransform != null && warehouseSpawnPoint != null)
         {
-            CharacterController characterController = xrOriginTransform.GetComponent<CharacterController>();
+            CharacterController cc = xrOriginTransform.GetComponent<CharacterController>();
+            if (cc != null) cc.enabled = false;
 
-            // Temporarily disable Character Controller to prevent physics snapping issues
-            if (characterController != null)
-            {
-                characterController.enabled = false;
-            }
-
-            // Move player to warehouse spawn point
             xrOriginTransform.position = warehouseSpawnPoint.position;
             xrOriginTransform.rotation = warehouseSpawnPoint.rotation;
 
-            // Re-enable Character Controller
-            if (characterController != null)
-            {
-                characterController.enabled = true;
-            }
-
-            Debug.Log("Teleported player to the warehouse!");
-        }
-        else
-        {
-            Debug.LogWarning("XR Origin or Warehouse Spawn Point is not assigned in the Inspector!");
+            if (cc != null) cc.enabled = true;
         }
     }
 }

@@ -6,11 +6,7 @@ public class BoxManager : MonoBehaviour
 {
     [Header("Quest Settings")]
     [Tooltip("Total number of tools required before the box can be picked up.")]
-<<<<<<< Updated upstream
-    public int totalToolsRequired = 4; // Public variable requested
-=======
     public int totalToolsRequired = 5; // Public variable requested
->>>>>>> Stashed changes
     private int currentToolsCollected = 0;
 
     [Header("References")]
@@ -21,7 +17,9 @@ public class BoxManager : MonoBehaviour
     {
         // Automatically grab reference if not assigned
         if (grabInteractable == null)
+        {
             grabInteractable = GetComponent<XRGrabInteractable>();
+        }
 
         // Lock the box so it cannot be picked up at the start
         if (grabInteractable != null)
