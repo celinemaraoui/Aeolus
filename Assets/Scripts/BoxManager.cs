@@ -6,32 +6,39 @@ public class BoxManager : MonoBehaviour
 {
     [Header("Quest Settings")]
     [Tooltip("Total number of tools required before the box can be picked up.")]
-    public int totalToolsRequired = 5; // Public variable requested
+    public int totalToolsRequired = 5;
     private int currentToolsCollected = 0;
 
     [Header("References")]
     [SerializeField] private XRGrabInteractable grabInteractable;
-    [SerializeField] private GameObject glowingOutlineVisual; // Optional: visual indicator when ready
+    [SerializeField] private GameObject glowingOutlineVisual;
+
+    [Header("Detection Settings")]
+    [SerializeField] private string toolTag = "Tool";
 
     void Start()
     {
-        // Automatically grab reference if not assigned
         if (grabInteractable == null)
-        {
             grabInteractable = GetComponent<XRGrabInteractable>();
-        }
 
-        // Lock the box so it cannot be picked up at the start
         if (grabInteractable != null)
-        {
             grabInteractable.enabled = false;
-        }
 
         if (glowingOutlineVisual != null)
             glowingOutlineVisual.SetActive(false);
     }
 
-    // Called by your tool drop zone when an item is placed inside
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject == gameObject) return;
+
+        if (other.CompareTag(toolTag))
+        {
+            Destroy(other.gameObject);
+            ToolCollected();
+        }
+    }
+
     public void ToolCollected()
     {
         currentToolsCollected++;
@@ -47,23 +54,12 @@ public class BoxManager : MonoBehaviour
     {
         if (grabInteractable != null)
         {
-            grabInteractable.enabled = true; // Enables picking up the box!
+            grabInteractable.enabled = true;
         }
 
         if (glowingOutlineVisual != null)
             glowingOutlineVisual.SetActive(true);
 
         Debug.Log("All tools collected! Box is now unlocked and ready to pick up.");
-    }
-
-    // Detect when the box reaches the warehouse drop-off zone
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("WarehouseDropOff"))
-        {
-            Debug.Log("Quest Complete! Box successfully delivered to the warehouse drop-off point.");
-            // Add your win condition, level complete screen, or audio trigger here
-            Destroy(gameObject); // Or disable box
-        }
     }
 }
