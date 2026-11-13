@@ -44,6 +44,13 @@ public class BoxManager : MonoBehaviour
         currentToolsCollected++;
         Debug.Log($"Tools inside box: {currentToolsCollected} / {totalToolsRequired}");
 
+        // TELL THE UI MANAGER TO COUNT DOWN!
+        UIManager uiManager = FindObjectOfType<UIManager>();
+        if (uiManager != null)
+        {
+            uiManager.CompleteTask();
+        }
+
         if (currentToolsCollected >= totalToolsRequired)
         {
             UnlockBoxPickup();
