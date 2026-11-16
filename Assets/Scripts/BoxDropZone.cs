@@ -4,6 +4,9 @@ using UnityEngine.Playables;
 
 public class BoxDropZone : MonoBehaviour
 {
+    [Header("UI & Progression Reference")]
+    [SerializeField] private UIManager uiManager;
+
     [Header("Drop-Off Settings")]
     [SerializeField] private string boxTag = "Box";
 
@@ -25,6 +28,12 @@ public class BoxDropZone : MonoBehaviour
         {
             hasPlayedCutscene = true;
             Debug.Log("Box delivered! Playing one-time cutscene and teleporting...");
+
+            // Mark Task 4 (Box Delivery) as completed in UIManager
+            if (uiManager != null)
+            {
+                uiManager.OnBoxDelivered();
+            }
 
             Destroy(other.gameObject);
             StartCoroutine(DropOffCutsceneRoutine());

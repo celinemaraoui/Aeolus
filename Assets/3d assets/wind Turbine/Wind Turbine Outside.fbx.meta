@@ -1,9 +1,34 @@
 fileFormatVersion: 2
-guid: 7d3bb5b31a71dab48806ee14c98b3c66
+guid: d87e5eabeafe8dc419dd53ad4f3e77d3
 ModelImporter:
   serializedVersion: 24200
   internalIDToNameTable: []
-  externalObjects: {}
+  externalObjects:
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: BaseAbsorbers
+    second: {fileID: 2100000, guid: 78f6ced0b1b1a9241806b7692ee0e478, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: MainTurbineTower
+    second: {fileID: 2100000, guid: 78f6ced0b1b1a9241806b7692ee0e478, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: OutsideLadder
+    second: {fileID: 2100000, guid: 78f6ced0b1b1a9241806b7692ee0e478, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: TowerRailing
+    second: {fileID: 2100000, guid: 78f6ced0b1b1a9241806b7692ee0e478, type: 2}
+  - first:
+      type: UnityEngine:Material
+      assembly: UnityEngine.CoreModule
+      name: Turbine blades
+    second: {fileID: 2100000, guid: 78f6ced0b1b1a9241806b7692ee0e478, type: 2}
   materials:
     materialImportMode: 2
     materialName: 0
