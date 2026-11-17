@@ -8,12 +8,11 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private string gameSceneName = "Aeolus";
 
     [Header("UI References")]
-    [SerializeField] private GameObject menuContentPanel; // Drag your inner panel/buttons container here
-    [SerializeField] private GameObject settingsPanel;     // Drag your Settings panel here
+    [SerializeField] private GameObject menuContentPanel; 
+    [SerializeField] private GameObject settingsPanel;    
 
     void Start()
     {
-        // Ensure the main menu is visible and settings is hidden when the game starts
         if (menuContentPanel != null)
         {
             menuContentPanel.SetActive(true);
@@ -37,7 +36,6 @@ public class MainMenuManager : MonoBehaviour
         SceneManager.LoadScene(gameSceneName);
     }
 
-    // Called when clicking Settings
     public void OpenSettings()
     {
         if (menuContentPanel != null) menuContentPanel.SetActive(false);
@@ -45,7 +43,6 @@ public class MainMenuManager : MonoBehaviour
         Debug.Log("Opening settings panel.");
     }
 
-    // Called when clicking Back from Settings
     public void ReturnToMainMenu()
     {
         if (settingsPanel != null) settingsPanel.SetActive(false);
@@ -53,7 +50,6 @@ public class MainMenuManager : MonoBehaviour
         Debug.Log("Returning to main menu.");
     }
 
-    // Called when clicking Quit
     public void QuitGame()
     {
         Debug.Log("Quitting application...");

@@ -28,8 +28,7 @@ public class BoxDropZone : MonoBehaviour
         {
             hasPlayedCutscene = true;
             Debug.Log("Box delivered! Playing one-time cutscene and teleporting...");
-
-            // Mark Task 4 (Box Delivery) as completed in UIManager
+                   
             if (uiManager != null)
             {
                 uiManager.OnBoxDelivered();

@@ -5,13 +5,13 @@ using UnityEngine.UI;
 public class MaintenanceManager : MonoBehaviour
 {
     [Header("Spatial Panel UI References")]
-    [SerializeField] private Image panelBackgroundImage;    // The UI Image showing the screen graphic
-    [SerializeField] private GameObject showListButtonObj;   // The interactive "Manifest" button object
+    [SerializeField] private Image panelBackgroundImage;    
+    [SerializeField] private GameObject showListButtonObj;   
 
     [Header("UI Sprites (Designs)")]
-    [SerializeField] private Sprite normalStateSprite;        // Screen 1: System Status Normal
-    [SerializeField] private Sprite alertStateSprite;        // Screen 2: Maintenance Identified + Manifest Button
-    [SerializeField] private Sprite manifestStateSprite;     // Screen 3: Manifest List & Redeploying
+    [SerializeField] private Sprite normalStateSprite;        
+    [SerializeField] private Sprite alertStateSprite;        
+    [SerializeField] private Sprite manifestStateSprite;     
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
@@ -27,20 +27,17 @@ public class MaintenanceManager : MonoBehaviour
 
     void Start()
     {
-        // 1. Hide the button at start
+       
         if (showListButtonObj != null)
             showListButtonObj.SetActive(false);
-
-        // 2. Set initial normal state graphic
+        
         SetPanelNormal();
 
-        // 3. Start alert sequence timer
         StartCoroutine(TriggerAlertSequence());
     }
 
     void Update()
     {
-        // Press the 'P' key anytime during play to instantly reset/teleport back to the warehouse spawn point
         if (Input.GetKeyDown(KeyCode.P))
         {
             ResetPlayerPosition();
@@ -57,44 +54,37 @@ public class MaintenanceManager : MonoBehaviour
 
     private IEnumerator TriggerAlertSequence()
     {
-        // Wait 2 seconds
+
         yield return new WaitForSeconds(startDelay);
 
-        // 1. Switch graphic to the Alert state (with the button area visible on the design)
         if (panelBackgroundImage != null && alertStateSprite != null)
         {
             panelBackgroundImage.sprite = alertStateSprite;
         }
 
-        // 2. Play warning sound
         if (audioSource != null && alertSound != null)
         {
             audioSource.PlayOneShot(alertSound);
         }
 
-        // 3. Enable the interactive button object over the graphic's button area
         if (showListButtonObj != null)
         {
             showListButtonObj.SetActive(true);
         }
     }
 
-    // Triggered when user clicks/interacts with the button on the panel
     public void OnShowListButtonClicked()
     {
-        // 1. Switch graphic to the Manifest & Redeploying state
         if (panelBackgroundImage != null && manifestStateSprite != null)
         {
             panelBackgroundImage.sprite = manifestStateSprite;
         }
 
-        // 2. Hide the button once clicked
         if (showListButtonObj != null)
         {
             showListButtonObj.SetActive(false);
         }
 
-        // 3. Start teleport sequence to warehouse
         StartCoroutine(TeleportRoutine());
     }
 
@@ -104,7 +94,6 @@ public class MaintenanceManager : MonoBehaviour
         ResetPlayerPosition();
     }
 
-    // Handles the actual movement safely with the CharacterController
     public void ResetPlayerPosition()
     {
         if (xrOriginTransform != null && warehouseSpawnPoint != null)

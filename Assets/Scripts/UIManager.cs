@@ -22,10 +22,10 @@ public class UIManager : MonoBehaviour
     [SerializeField] private TMP_Text tasksText;
 
     [Header("Spatial Panel UI References")]
-    [SerializeField] private GameObject toolsListPanel;         // Pops up when "Show Tools" is pressed
-    [SerializeField] private GameObject doneButton;             // Appears after all tools are collected
-    [SerializeField] private GameObject takeBoxToDropOffPanel;  // Appears after "Done" is pressed
-    [SerializeField] private GameObject dropOffZoneObject;      // The physical drop-off zone in the warehouse
+    [SerializeField] private GameObject toolsListPanel;         
+    [SerializeField] private GameObject doneButton;             
+    [SerializeField] private GameObject takeBoxToDropOffPanel;  
+    [SerializeField] private GameObject dropOffZoneObject;     
 
     [Header("Countdown Settings")]
     [SerializeField] private float timeRemaining = 180f;
@@ -36,7 +36,7 @@ public class UIManager : MonoBehaviour
     private int currentTasksRemaining;
 
     [Header("Warehouse Tool Collection Settings")]
-    [SerializeField] private int totalToolsRequired = 5; // Number of tools needed to finish Task 3
+    [SerializeField] private int totalToolsRequired = 5; 
     private int toolsCollected = 0;
 
     void Start()
@@ -80,7 +80,7 @@ public class UIManager : MonoBehaviour
         timerText.text = string.Format("Time: {0:00}:{1:00}", minutes, seconds);
     }
 
-    // --- MILESTONE 1: Press "Manifest" in the Office ---
+    
     public void OnManifestButtonPressed()
     {
         if (currentStage == GameStage.Stage1_Manifest)
@@ -91,7 +91,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- MILESTONE 2: Press "Tool Check" / "Show Tools" in the Warehouse ---
+    
     public void OnShowToolsButtonPressed()
     {
         if (currentStage == GameStage.Stage2_ShowTools)
@@ -103,7 +103,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- MILESTONE 3: Put ALL tools in the box (Called by BoxManager per tool) ---
+
     public void CompleteTask()
     {
         if (currentStage == GameStage.Stage2_CollectTools)
@@ -111,7 +111,6 @@ public class UIManager : MonoBehaviour
             toolsCollected++;
             Debug.Log($"Tool collected: {toolsCollected}/{totalToolsRequired}");
 
-            // Only decrement the main HUD task once ALL tools are inside the box
             if (toolsCollected >= totalToolsRequired)
             {
                 currentStage = GameStage.Stage2_WaitForDone;
@@ -123,7 +122,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- Press "Done" button to reveal Drop-Off Zone (Does not decrement task counter) ---
+
     public void OnDoneButtonPressed()
     {
         if (currentStage == GameStage.Stage2_WaitForDone)
@@ -137,7 +136,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- MILESTONE 4: Box placed in the Drop-Off Zone ---
+  
     public void OnBoxDelivered()
     {
         if (currentStage == GameStage.Stage3_DeliverBox)
@@ -148,7 +147,7 @@ public class UIManager : MonoBehaviour
         }
     }
 
-    // --- MILESTONE 5: Reached top of the Wind Turbine Ladder ---
+ 
     public void OnLadderClimbed()
     {
         if (currentStage == GameStage.Stage3_ClimbLadder)
