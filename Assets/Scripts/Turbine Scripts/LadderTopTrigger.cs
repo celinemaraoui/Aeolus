@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class LadderTopTrigger : MonoBehaviour
 {
-    public UIManager uiManager;
+    public WarehouseUIManager warehouseUIManager;
     private bool triggered = false;
 
     private void OnTriggerEnter(Collider other)
@@ -10,7 +10,12 @@ public class LadderTopTrigger : MonoBehaviour
         if (!triggered && (other.CompareTag("Player") || other.GetComponentInParent<Unity.XR.CoreUtils.XROrigin>() != null))
         {
             triggered = true;
-            if (uiManager != null) uiManager.OnLadderClimbed();
+            Debug.Log("Reached top of ladder.");
+
+            if (warehouseUIManager != null)
+            {
+                warehouseUIManager.OnBoxDelivered();
+            }
         }
     }
 }

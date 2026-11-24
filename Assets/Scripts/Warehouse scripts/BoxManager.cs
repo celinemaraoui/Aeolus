@@ -12,6 +12,7 @@ public class BoxManager : MonoBehaviour
     [Header("References")]
     [SerializeField] private XRGrabInteractable grabInteractable;
     [SerializeField] private GameObject glowingOutlineVisual;
+    [SerializeField] private WarehouseUIManager warehouseUIManager;
 
     [Header("Detection Settings")]
     [SerializeField] private string toolTag = "Tool";
@@ -26,15 +27,24 @@ public class BoxManager : MonoBehaviour
 
         if (glowingOutlineVisual != null)
             glowingOutlineVisual.SetActive(false);
+
+        if (warehouseUIManager == null)
+            warehouseUIManager = FindFirstObjectByType<WarehouseUIManager>(FindObjectsInactive.Include);
     }
 
     private void OnTriggerEnter(Collider other)
     {
         if (other.gameObject == gameObject) return;
 
-        if (other.CompareTag(toolTag))
+        IndividualToolUI individualToolUI = other.GetComponentInParent<IndividualToolUI>();
+
+        if (other.CompareTag(toolTag) || individualToolUI != null)
         {
-            Destroy(other.gameObject);
+            if (individualToolUI != null)
+                individualToolUI.ForceHidePopup();
+
+            GameObject objectToDestroy = individualToolUI != null ? individualToolUI.gameObject : other.gameObject;
+            Destroy(objectToDestroy);
             ToolCollected();
         }
     }
@@ -44,11 +54,12 @@ public class BoxManager : MonoBehaviour
         currentToolsCollected++;
         Debug.Log($"Tools inside box: {currentToolsCollected} / {totalToolsRequired}");
 
+        if (warehouseUIManager == null)
+            warehouseUIManager = FindFirstObjectByType<WarehouseUIManager>(FindObjectsInactive.Include);
 
-        UIManager uiManager = FindObjectOfType<UIManager>();
-        if (uiManager != null)
+        if (warehouseUIManager != null)
         {
-            uiManager.CompleteTask();
+            warehouseUIManager.CompleteTask();
         }
 
         if (currentToolsCollected >= totalToolsRequired)

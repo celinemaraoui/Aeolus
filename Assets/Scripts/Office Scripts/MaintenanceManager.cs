@@ -1,25 +1,25 @@
 ﻿using System.Collections;
 using UnityEngine;
-using UnityEngine.UI; 
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class MaintenanceManager : MonoBehaviour
 {
     [Header("Spatial Panel UI References")]
-    [SerializeField] private Image panelBackgroundImage;    
-    [SerializeField] private GameObject showListButtonObj;   
+    [SerializeField] private Image panelBackgroundImage;
+    [SerializeField] private GameObject showListButtonObj;
 
     [Header("UI Sprites (Designs)")]
-    [SerializeField] private Sprite normalStateSprite;        
-    [SerializeField] private Sprite alertStateSprite;        
-    [SerializeField] private Sprite manifestStateSprite;     
+    [SerializeField] private Sprite normalStateSprite;
+    [SerializeField] private Sprite alertStateSprite;
+    [SerializeField] private Sprite manifestStateSprite;
 
     [Header("Audio Settings")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip alertSound;
 
-    [Header("Teleport & Reset Settings")]
-    [SerializeField] private Transform xrOriginTransform;
-    [SerializeField] private Transform warehouseSpawnPoint;
+    [Header("Scene Transition Settings")]
+    [SerializeField] private string WarehouseSceneName = "WarehouseScene";
     [SerializeField] private float teleportDelay = 2.0f;
 
     [Header("Timer Settings")]
@@ -27,10 +27,9 @@ public class MaintenanceManager : MonoBehaviour
 
     void Start()
     {
-       
         if (showListButtonObj != null)
             showListButtonObj.SetActive(false);
-        
+
         SetPanelNormal();
 
         StartCoroutine(TriggerAlertSequence());
@@ -40,7 +39,7 @@ public class MaintenanceManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.P))
         {
-            ResetPlayerPosition();
+            LoadWarehouseScene();
         }
     }
 
@@ -54,7 +53,6 @@ public class MaintenanceManager : MonoBehaviour
 
     private IEnumerator TriggerAlertSequence()
     {
-
         yield return new WaitForSeconds(startDelay);
 
         if (panelBackgroundImage != null && alertStateSprite != null)
@@ -91,26 +89,19 @@ public class MaintenanceManager : MonoBehaviour
     private IEnumerator TeleportRoutine()
     {
         yield return new WaitForSeconds(teleportDelay);
-        ResetPlayerPosition();
+        LoadWarehouseScene();
     }
 
-    public void ResetPlayerPosition()
+    public void LoadWarehouseScene()
     {
-        if (xrOriginTransform != null && warehouseSpawnPoint != null)
+        if (!string.IsNullOrWhiteSpace(WarehouseSceneName))
         {
-            CharacterController cc = xrOriginTransform.GetComponent<CharacterController>();
-            if (cc != null) cc.enabled = false;
-
-            xrOriginTransform.position = warehouseSpawnPoint.position;
-            xrOriginTransform.rotation = warehouseSpawnPoint.rotation;
-
-            if (cc != null) cc.enabled = true;
-
-            Debug.Log("Player position reset to warehouse spawn point.");
+            Debug.Log($"Loading warehouse scene: {WarehouseSceneName}");
+            SceneManager.LoadScene(WarehouseSceneName);
         }
         else
         {
-            Debug.LogWarning("MaintenanceManager: XR Origin or Warehouse Spawn Point references are missing!");
+            Debug.LogWarning("MaintenanceManager: Warehouse Scene Name is empty!");
         }
     }
 }

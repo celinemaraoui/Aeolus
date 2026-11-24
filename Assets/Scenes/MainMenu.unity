@@ -2273,7 +2273,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4f8b3c7ed7cd4bd41bc2dffb2d0bc314, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MainMenuManager
-  gameSceneName: Aeolus
+  gameSceneName: OfficeScene
   menuContentPanel: {fileID: 1122425650196427326}
   settingsPanel: {fileID: 0}
 --- !u!222 &6852857041887380441

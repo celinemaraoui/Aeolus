@@ -5,7 +5,7 @@ using UnityEngine.UI;
 public class MainMenuManager : MonoBehaviour
 {
     [Header("Scene Settings")]
-    [SerializeField] private string gameSceneName = "Aeolus";
+    [SerializeField] private string gameSceneName = "OfficeScene";
 
     [Header("UI References")]
     [SerializeField] private GameObject menuContentPanel; 
